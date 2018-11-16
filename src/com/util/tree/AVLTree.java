@@ -1,50 +1,45 @@
 package com.util.tree;
 
-import jdk.nashorn.api.tree.Tree;
-
 import java.util.*;
 
-public class AVLTree<K extends Comparable<K>> {
-    TreeNode<K>  root;
+//利用AVL树实现set模板
+public class AVLTree<T extends Comparable<T>> {
+    AVLNode<T> root;
 
     public AVLTree() {
         this.root = null;
     }
 
     //树的节点，内部类
-    private class TreeNode<K extends Comparable<K>> extends Node<K> {
+    private class AVLNode<T extends Comparable<T>> extends Node<T> {
 
-        protected TreeNode<K> left;
-        protected TreeNode<K> right;
-        protected TreeNode<K> parent;
+        protected AVLNode<T> left;
+        protected AVLNode<T> right;
+        protected AVLNode<T> parent;
         int height;
 
-        public TreeNode(K key) {
-            super(key);
+        public AVLNode(T data) {
+            super(data);
             this.height = 0;
             this.left = this.right = this.parent = null;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
         }
     }
 
     //得到当前节点的高度
-    private int getHeight(TreeNode node) {
+    private int getHeight(AVLNode node) {
         return node == null ? -1 : node.height;
     }
 
     //折半查找
-    private int binSearch(K o[], K key){
+    private int binSearch(T o[], T data){
         int count = 1;
         int left = 0, right = o.length - 1;
         int mid;
         while(left <= right){
             mid = (left + right) >> 1;
-            if(o[mid].compareTo(key) == 0)
+            if(o[mid].compareTo(data) == 0)
                 break;
-            else if(o[mid].compareTo(key) < 0)
+            else if(o[mid].compareTo(data) < 0)
                 left = mid + 1;
             else
                 right = mid - 1;
@@ -55,10 +50,10 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //平衡二叉树的左旋
-    private void leftRotate(TreeNode<K> node){
+    private void leftRotate(AVLNode<T> node){
         if(node == null)
             return ;
-        TreeNode<K> rotateNode = node.right;
+        AVLNode<T> rotateNode = node.right;
         node.right = rotateNode.left;
         if(rotateNode.left != null)
             rotateNode.left.parent = node;
@@ -86,10 +81,10 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //平衡二叉树的右旋
-    private void rightRotate(TreeNode<K> node){
+    private void rightRotate(AVLNode<T> node){
         if(node == null)
             return ;
-        TreeNode<K> rotateNode = node.left;
+        AVLNode<T> rotateNode = node.left;
         node.left = rotateNode.right;
         if(rotateNode.right != null)
             rotateNode.right.parent = node;
@@ -115,10 +110,10 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //AVL的单变量插入
-    public void insert(K data){
-        TreeNode newNode = new TreeNode(data);
-        TreeNode prev = null;
-        TreeNode search = this.root;
+    public void insert(T data){
+        AVLNode newNode = new AVLNode(data);
+        AVLNode prev = null;
+        AVLNode search = this.root;
         if(this.root == null)
             this.root = newNode;
         else{
@@ -143,12 +138,12 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //插入修复函数
-    private void insertFixUp(TreeNode<K> node){
+    private void insertFixUp(AVLNode<T> node){
         while(node != null){
             node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
             if(node.parent != null && node.parent.parent != null){
-                TreeNode<K> nodeParent = node.parent;
-                TreeNode<K> nodeGrandParent = node.parent.parent;
+                AVLNode<T> nodeParent = node.parent;
+                AVLNode<T> nodeGrandParent = node.parent.parent;
                 nodeParent.height = Math.max(getHeight(nodeParent.left), getHeight(nodeParent.right)) + 1;
                 nodeGrandParent.height = Math.max(getHeight(nodeGrandParent.left), getHeight(nodeGrandParent.right)) + 1;
 
@@ -170,14 +165,14 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //
-    public boolean contain(K key){
-        TreeNode<K> p = this.root;
+    public boolean contain(T data){
+        AVLNode<T> p = this.root;
 
         while(p != null){
-            if(key.compareTo(p.data) < 0){
+            if(data.compareTo(p.data) < 0){
                 p = p.left;
             }
-            else if(key.compareTo(p.data) > 0){
+            else if(data.compareTo(p.data) > 0){
                 p = p.right;
             }
             else
@@ -187,8 +182,8 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     public void preInorder(){
-        Stack<TreeNode> stack = new Stack<>();
-        TreeNode<K> p = this.root;
+        Stack<AVLNode> stack = new Stack<>();
+        AVLNode<T> p = this.root;
 
         while(p != null || stack.isEmpty() == false){
             while(p != null){
@@ -207,9 +202,9 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     public void postInorder(){
-        TreeNode<K> p = this.root;
-        TreeNode<K> prev = null;
-        Stack<TreeNode<K>> stack = new Stack<>();
+        AVLNode<T> p = this.root;
+        AVLNode<T> prev = null;
+        Stack<AVLNode<T>> stack = new Stack<>();
 
         while(p != null || stack.empty() == false){
             if(p != null){
@@ -232,37 +227,37 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //插入有序数组
-    public void insert(K o[]){
+    public void insert(T o[]){
         if(o == null)
             return ;
 
         Arrays.sort(o);
-        LinkedList<Pair<K,Integer>> pairList = new LinkedList<>();
+        LinkedList<Pair<T,Integer>> pairList = new LinkedList<>();
 
-        for(K tmp : o){
+        for(T tmp : o){
             Pair pa = new Pair(tmp, 0);
             pairList.addLast(pa);
         }
 
-        for(Pair<K,Integer> tmp : pairList){
+        for(Pair<T,Integer> tmp : pairList){
             //折半查找部分
             int count = binSearch(o, tmp.getFirst());
             tmp.setSecond(count);
         }
 
-        pairList.sort((Pair<K,Integer> o1, Pair<K,Integer> o2)->o1.second - o2.second);
+        pairList.sort((Pair<T,Integer> o1, Pair<T,Integer> o2)->o1.second - o2.second);
 
-        for(Pair<K,Integer> tmp : pairList){
+        for(Pair<T,Integer> tmp : pairList){
             System.out.println("[" + tmp.getFirst() + ", " + tmp.getSecond() + "]");
         }
 
-        for(Pair<K,Integer> tmp : pairList){
+        for(Pair<T,Integer> tmp : pairList){
             this.insert(tmp.getFirst());
         }
     }
 
-    private TreeNode<K> findMinNode(TreeNode<K> node){
-        TreeNode<K> prev = null;
+    private AVLNode<T> findMinNode(AVLNode<T> node){
+        AVLNode<T> prev = null;
         while(node != null){
             prev = node;
             node = node.left;
@@ -270,8 +265,8 @@ public class AVLTree<K extends Comparable<K>> {
         return prev;
     }
 
-    private TreeNode<K> findNode(K data){
-        TreeNode<K> p = this.root;
+    private AVLNode<T> findNode(T data){
+        AVLNode<T> p = this.root;
         while(p != null){
             if(data.compareTo(p.data) < 0)
                 p = p.left;
@@ -285,7 +280,7 @@ public class AVLTree<K extends Comparable<K>> {
 
 
     //平衡二叉树的嫁接节点
-    private void transplant(TreeNode<K> deleteNode, TreeNode<K> nextNode){
+    private void transplant(AVLNode<T> deleteNode, AVLNode<T> nextNode){
         if(deleteNode == null)
             return ;
         if(deleteNode.parent == null) {
@@ -304,19 +299,19 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //删除指定节点
-    public void delete(K data){
-        TreeNode<K> delNode = findNode(data);
+    public void delete(T data){
+        AVLNode<T> delNode = findNode(data);
 
         if(delNode == null)
             return ;
-        TreeNode<K> fixUpNode = delNode.parent;
+        AVLNode<T> fixUpNode = delNode.parent;
 
         if(delNode.left == null)
             this.transplant(delNode, delNode.right);
         else if(delNode.right == null)
             this.transplant(delNode, delNode.left);
         else{
-            TreeNode<K> tmpMinNode = this.findMinNode(delNode.right);
+            AVLNode<T> tmpMinNode = this.findMinNode(delNode.right);
 
             if(delNode.right != tmpMinNode){
                 transplant(tmpMinNode, tmpMinNode.right);
@@ -334,10 +329,10 @@ public class AVLTree<K extends Comparable<K>> {
     }
 
     //删除修复函数
-    private void deleteFixUp(TreeNode<K> node){
+    private void deleteFixUp(AVLNode<T> node){
         while(node != null){
             node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
-            TreeNode<K> child = null;
+            AVLNode<T> child = null;
             if(getHeight(node.left) - getHeight(node.right) == 2){
                 child = node.left;
                 if(getHeight(child.left) < getHeight(child.right)){
@@ -360,9 +355,9 @@ public class AVLTree<K extends Comparable<K>> {
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
 
-        Stack<TreeNode<K>> stack = new Stack<>();
+        Stack<AVLNode<T>> stack = new Stack<>();
 
-        TreeNode p = this.root;
+        AVLNode p = this.root;
 
         while(p != null || stack.isEmpty() == false){
             while(p != null){
@@ -371,7 +366,7 @@ public class AVLTree<K extends Comparable<K>> {
             }
 
             if(stack.isEmpty() == false){
-                TreeNode<K> top = stack.pop();
+                AVLNode<T> top = stack.pop();
                 stringBuffer.append(top.data + " ");
                 p = top.right;
             }
