@@ -5,15 +5,15 @@ import java.util.Stack;
 //利用红黑树实现set模板
 public class RBTree<T extends Comparable<T>> {
 
-    private final static int RED = 0;
-    private final static int BLACK = 1;
+    private final static boolean RED = false;
+    private final static boolean BLACK = true;
 
     private class RBNode<T extends Comparable<T>> extends Node<T> {
 
         protected RBNode<T> left;
         protected RBNode<T> right;
         protected RBNode<T> parent;
-        int color;
+        protected boolean color;
 
         public RBNode(T data) {
             super(data);
@@ -28,7 +28,7 @@ public class RBTree<T extends Comparable<T>> {
         this.root = null;
     }
 
-    private int getColor(RBNode<T> node){
+    private boolean getColor(RBNode<T> node){
         return node == null ? BLACK : node.color;
     }
 
@@ -44,7 +44,7 @@ public class RBTree<T extends Comparable<T>> {
         return node == null ? null : node.right;
     }
 
-    private void setColor(RBNode<T> node, int color){
+    private void setColor(RBNode<T> node, boolean color){
         if(node != null)
             node.color = color;
     }
