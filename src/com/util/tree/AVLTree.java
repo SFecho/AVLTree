@@ -122,13 +122,14 @@ public class AVLTree<K extends Comparable<K>> {
         if(this.root == null)
             this.root = newNode;
         else{
-
             while(search != null){
                 prev = search;
                 if(search.data.compareTo(data) > 0)
                     search = search.left;
-                else
+                else if(search.data.compareTo(data) < 0)
                     search = search.right;
+                else
+                    return ;
             }
 
             if(prev.data.compareTo(data) > 0)
@@ -308,7 +309,6 @@ public class AVLTree<K extends Comparable<K>> {
 
         if(delNode == null)
             return ;
-
         TreeNode<K> fixUpNode = delNode.parent;
 
         if(delNode.left == null)
@@ -317,6 +317,7 @@ public class AVLTree<K extends Comparable<K>> {
             this.transplant(delNode, delNode.left);
         else{
             TreeNode<K> tmpMinNode = this.findMinNode(delNode.right);
+
             if(delNode.right != tmpMinNode){
                 transplant(tmpMinNode, tmpMinNode.right);
                 tmpMinNode.right = delNode.right;
@@ -324,6 +325,7 @@ public class AVLTree<K extends Comparable<K>> {
                 fixUpNode = tmpMinNode.parent;
             }else
                 fixUpNode = tmpMinNode;
+
             tmpMinNode.left = delNode.left;
             delNode.left.parent = tmpMinNode;
             transplant(delNode, tmpMinNode);
@@ -338,14 +340,14 @@ public class AVLTree<K extends Comparable<K>> {
             TreeNode<K> child = null;
             if(getHeight(node.left) - getHeight(node.right) == 2){
                 child = node.left;
-                if(getHeight(child) < getHeight(child)){
+                if(getHeight(child.left) < getHeight(child.right)){
                     leftRotate(child);
                 }
                 rightRotate(node);
             }
             else if(getHeight(node.left) - getHeight(node.right) == -2){
                 child = node.right;
-                if(getHeight(child) > getHeight(child)){
+                if(getHeight(child.left) > getHeight(child.right)){
                     rightRotate(child);
                 }
                 leftRotate(node);
