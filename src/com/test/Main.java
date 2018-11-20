@@ -67,5 +67,35 @@ public class Main {
         rbTree.preInorder();
         rbTree.postInorder();
 
+        System.out.println("delete " + a[2]);
+        rbTree.delete(a[2]);
+        System.out.println(rbTree);
+        rbTree.preInorder();
+        rbTree.postInorder();
+
+        System.out.println("delete " + a[3]);
+        rbTree.delete(a[3]);
+        System.out.println(rbTree);
+        rbTree.preInorder();
+        rbTree.postInorder();
+
+
+        System.out.println("delete " + a[4]);
+        rbTree.delete(a[4]);
+        System.out.println(rbTree);
+        rbTree.preInorder();
+        rbTree.postInorder();
+
+        System.out.println("delete " + a[5]);
+        rbTree.delete(a[5]);
+        System.out.println(rbTree);
+        rbTree.preInorder();
+        rbTree.postInorder();
+
+        System.out.println("delete " + a[6]);
+        rbTree.delete(a[6]);
+        System.out.println(rbTree);
+        rbTree.preInorder();
+        rbTree.postInorder();
     }
 }
