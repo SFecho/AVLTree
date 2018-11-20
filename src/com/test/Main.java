@@ -10,22 +10,26 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-//        Integer arr[] = {15, 17, 18, 36, 45, 47, 48, 53, 72, 93, 95, 100};
-//        BinTree<Integer> tree = new BinTree<>();
-//        tree.insert(arr);
+
         AVLTree<Integer> avlTree = new AVLTree<>();
         Random random = new Random();
         int a[] = new int[12];
         for(int i = 0; i < a.length; i++) {
-            a[i] = random.nextInt(100);
-            avlTree.insert(a[i]);
+           a[i] = random.nextInt(100);
+           avlTree.insert(a[i]);
         }
-        System.out.println("AVLTree-set:");
+        System.out.println("===========AVLTree-set===========");
 
         System.out.println(avlTree);
         avlTree.preInorder();
         avlTree.postInorder();
 
+        System.out.println("===========search-test===========");
+        for(int i = 0 ;i < a.length; i++)
+            System.out.println(a[i] + " is " + avlTree.contain(a[i]));
+        System.out.println(20 + " is " + avlTree.contain(20));
+
+        System.out.println("===========delete-test===========");
         System.out.println("delete " + a[2]);
         avlTree.delete(a[2]);
         System.out.println(avlTree);
@@ -57,15 +61,23 @@ public class Main {
         avlTree.preInorder();
         avlTree.postInorder();
 
-        //RBTree
+        //RBTree测试部分
         RBTree<Integer> rbTree = new RBTree<>();
-        System.out.println("RBTree-set:");
+        System.out.println("===========RBTree-set===========");
         for(int i = 0; i < a.length; i++) {
             rbTree.insert(a[i]);
         }
+
         System.out.println(rbTree);
         rbTree.preInorder();
         rbTree.postInorder();
+
+        System.out.println("===========search-test===========");
+        for(int i = 0 ;i < a.length; i++)
+            System.out.println(a[i] + " is " + rbTree.contain(a[i]));
+        System.out.println(20 + " is " + rbTree.contain(20));
+
+        System.out.println("===========delete-test===========");
 
         System.out.println("delete " + a[2]);
         rbTree.delete(a[2]);

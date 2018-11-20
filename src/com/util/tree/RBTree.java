@@ -65,6 +65,15 @@ public class RBTree<T extends Comparable<T>> {
             node.right = newRight;
     }
 
+    private void setData(RBNode<T> node, T newData){
+        if(node != null)
+            node.data = newData;
+    }
+
+    private T getData(RBNode<T> node){
+        return node == null ? null : node.data;
+    }
+
     private void leftRotate(RBNode<T> node){
         if(node == null)
             return ;
@@ -109,23 +118,6 @@ public class RBTree<T extends Comparable<T>> {
         }
         setParent(rotateNode, getParent(node));
         setParent(node, rotateNode);
-    }
-
-    private void transplant(RBNode<T> deleteNode, RBNode<T> nextNode) {
-
-        if (deleteNode == null)
-            return;
-        if (getParent(deleteNode) == null) {
-            this.root = nextNode;
-        } else {
-            if (deleteNode == getLeft(getParent(deleteNode))) {
-                setLeft(getParent(deleteNode), nextNode);
-            } else if (deleteNode == getRight(getParent(deleteNode)))
-                setRight(getParent(deleteNode), nextNode);
-        }
-
-        if(nextNode != null)
-            setParent(nextNode, getParent(deleteNode));
     }
 
     public void insert(T data){
@@ -224,171 +216,110 @@ public class RBTree<T extends Comparable<T>> {
         return p;
     }
 
+    public boolean contain(T data){
+        return findNode(data) != null ? true : false;
+    }
+
     public void delete(T data){
         RBNode<T> delNode = findNode(data);
-
         if(delNode == null)
             return ;
 
-        RBNode<T> fixUpNode = delNode;
-        boolean originColor = getColor(delNode);
-
-        if(getLeft(delNode) == null){
-            fixUpNode = getRight(delNode);
-            transplant(delNode, getRight(delNode));
-        }else if(getRight(delNode) == null){
-            fixUpNode = getLeft(delNode);
-            transplant(delNode, getLeft(delNode));
-        }else{
-            RBNode<T> tmpMinNode = findMinNode(delNode.right);
-            originColor = getColor(tmpMinNode);
-            fixUpNode = getRight(tmpMinNode);
-
-            if(delNode == this.root)
-                this.root = tmpMinNode;
-
-            if(getRight(delNode) != tmpMinNode){
-                transplant(tmpMinNode, getRight(tmpMinNode));
-                setRight(tmpMinNode, getRight(delNode));
-                setParent(getRight(delNode), tmpMinNode);
-            }
-            delNode.left.parent = tmpMinNode;
-            tmpMinNode.left = delNode.left;
-            transplant(delNode, tmpMinNode);
-            setColor(tmpMinNode, getColor(delNode));
+        if(getLeft(delNode) != null && getRight(delNode) != null){
+            RBNode<T> min = findMinNode(getRight(delNode));
+            setData(delNode, getData(min));
+            delNode = min;
         }
-        if(originColor == BLACK)
-            deleteFixUp(fixUpNode);
+        RBNode<T> fixUpNode = getLeft(delNode) != null ? getLeft(delNode) : getRight(delNode);
+
+        if(fixUpNode != null){
+            setParent(fixUpNode, getParent(delNode));
+            if(getParent(delNode) == null)
+                this.root = fixUpNode;
+            else{
+                if(getLeft(getParent(delNode)) == delNode)
+                    setLeft(getParent(delNode), fixUpNode);
+                else
+                    setRight(getParent(delNode), fixUpNode);
+            }
+            setLeft(delNode, null);
+            setRight(delNode, null);
+            setParent(delNode, null);
+            if(getColor(delNode) == BLACK)
+                deleteFixUp(fixUpNode);
+        }
+        else if(getParent(delNode) == null)
+            this.root = null;
+        else{
+            //待删除的节点没儿子
+            if(getColor(delNode) == BLACK)
+                deleteFixUp(delNode);
+            if(getParent(delNode) != null){
+                if(getLeft(getParent(delNode)) == delNode)
+                    setLeft(getParent(delNode), null);
+                else if(getRight(getParent(delNode)) == delNode)
+                    setRight(getParent(delNode), null);
+
+                setParent(delNode, null);
+            }
+        }
     }
 
-//    private void fixAfterDeletion(RBNode<T> x) {
-//        while (x != root && getColor(x) == BLACK) {
-//            if (x == getLeft(getParent(x))) {
-//                RBNode<T> sib = getRight(getParent(x));
-//
-//                if (getColor(sib) == RED) {
-//                    setColor(sib, BLACK);
-//                    setColor(getParent(x), RED);
-//                    leftRotate(getParent(x));
-//                    sib = getRight(getParent(x));
-//                }
-//
-//                if (getColor(getLeft(sib))  == BLACK &&
-//                        getColor(getRight(sib)) == BLACK) {
-//                    setColor(sib, RED);
-//                    x = getParent(x);
-//                } else {
-//                    if (getColor(getRight(sib)) == BLACK) {
-//                        setColor(getLeft(sib), BLACK);
-//                        setColor(sib, RED);
-//                        rightRotate(sib);
-//                        sib = getRight(getParent(x));
-//                    }
-//                    setColor(sib, getColor(getParent(x)));
-//                    setColor(getParent(x), BLACK);
-//                    setColor(getRight(sib), BLACK);
-//                    leftRotate(getParent(x));
-//                    x = root;
-//                }
-//            } else { // symmetric
-//                RBNode<T> sib = getLeft(getParent(x));
-//
-//                if (getColor(sib) == RED) {
-//                    setColor(sib, BLACK);
-//                    setColor(getParent(x), RED);
-//                    rightRotate(getParent(x));
-//                    sib = getLeft(getParent(x));
-//                }
-//
-//                if (getColor(getRight(sib)) == BLACK &&
-//                        getColor(getLeft(sib)) == BLACK) {
-//                    setColor(sib, RED);
-//                    x = getParent(x);
-//                } else {
-//                    if (getColor(getLeft(sib)) == BLACK) {
-//                        setColor(getRight(sib), BLACK);
-//                        setColor(sib, RED);
-//                        rightRotate(sib);
-//                        sib = getLeft(getParent(x));
-//                    }
-//                    setColor(sib, getColor(getParent(x)));
-//                    setColor(getParent(x), BLACK);
-//                    setColor(getLeft(sib), BLACK);
-//                    rightRotate(getParent(x));
-//                    x = root;
-//                }
-//            }
-//        }
-//        setColor(x, BLACK);
-//    }
+    private void deleteFixUp(RBNode<T> node) {
+        while (node != this.root && getColor(node) == BLACK) {
+            if (node == getLeft(getParent(node))) {
+                RBNode<T> sib = getRight(getParent(node));
 
-    private void deleteFixUp(RBNode<T> node){
-        while(node != this.root && getColor(node) == BLACK){
-            RBNode<T> brother;
-            RBNode<T> parent = getParent(node);
-            //如果当前节点是它父亲的左儿子
-            if(node == getLeft(parent)){
-                brother = getRight(parent);
-                //情况1：兄弟是红色，则需将父亲置红，兄弟置黑，进行一次左旋
-                if(getColor(brother) == RED){
-                    setColor(brother, BLACK);
-                    setColor(parent, RED);
-                    leftRotate(parent);
-                    parent = getParent(node);
-                    brother = getRight(parent);
+                if (getColor(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(getParent(node), RED);
+                    leftRotate(getParent(node));
+                    sib = getRight(getParent(node));
                 }
-                //情况2：兄弟是黑色，两个侄子也都是黑色，将兄弟置红，node转至其父亲节点
-                if(getColor(getLeft(brother)) == BLACK && getColor(getRight(brother)) == BLACK){
-                    setColor(brother, RED);
-                    node = getParent(node);
-                    //情况3：如果左侄子为红，右侄子为黑，将左侄子置黑，兄弟置红，进行右旋
-                }else{
-                    if(getColor(getRight(brother)) == BLACK){
-                        setColor(getLeft(brother), BLACK);
-                        setColor(brother, RED);
-                        rightRotate(brother);
-                        parent = getParent(node);
-                        brother = getRight(parent);
-                    }
-                    //情况4：如果右侄子为红，左侄子任意，则将父亲的颜色赋给兄弟，父亲置黑，左旋，同时node回到根节点，退出循环
-                    parent = getParent(node);
 
-                    setColor(brother, getColor(parent));
-                    setColor(parent, BLACK);
-                    setColor(getRight(brother), BLACK);
-                    leftRotate(parent);
-                    node = this.root;
-                }
-            }else if(node == getRight(parent)){
-                brother = getLeft(parent);
-                //情况1：兄弟是红色，则需将父亲置红，兄弟置黑，进行一次左旋
-                if(getColor(brother) == RED){
-                    setColor(brother, BLACK);
-                    setColor(parent, RED);
-                    rightRotate(parent);
-                    parent = getParent(node);
-                    brother = getLeft(parent);
-                }
-                //情况2：兄弟是黑色，两个侄子也都是黑色，将兄弟置红，node转至其父亲节点
-                if(getColor(getLeft(brother)) == BLACK && getColor(getRight(brother)) == BLACK){
-                    setColor(brother, RED);
+                if (getColor(getLeft(sib))  == BLACK &&
+                        getColor(getRight(sib)) == BLACK) {
+                    setColor(sib, RED);
                     node = getParent(node);
-                    //情况3：如果左侄子为红，右侄子为黑，将左侄子置黑，兄弟置红，进行右旋
-                }else{
-                    if(getColor(getLeft(brother)) == BLACK){
-                        setColor(getRight(brother), BLACK);
-                        setColor(brother, RED);
-                        leftRotate(brother);
-                        parent = getParent(node);
-                        brother = getLeft(parent);
+                } else {
+                    if (getColor(getRight(sib)) == BLACK) {
+                        setColor(getLeft(sib), BLACK);
+                        setColor(sib, RED);
+                        rightRotate(sib);
+                        sib = getRight(getParent(node));
                     }
-                    //情况4：如果右侄子为红，左侄子任意，则将父亲的颜色赋给兄弟，父亲置黑，左旋，同时node回到根节点，退出循环
-                    parent = getParent(node);
-                    setColor(brother, getColor(parent));
-                    setColor(parent, BLACK);
-                    setColor(getLeft(brother), BLACK);
-                    rightRotate(parent);
-                    node = this.root;
+                    setColor(sib, getColor(getParent(node)));
+                    setColor(getParent(node), BLACK);
+                    setColor(getRight(sib), BLACK);
+                    leftRotate(getParent(node));
+                    node = root;
+                }
+            } else { // symmetric
+                RBNode<T> sib = getLeft(getParent(node));
+
+                if (getColor(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(getParent(node), RED);
+                    rightRotate(getParent(node));
+                    sib = getLeft(getParent(node));
+                }
+
+                if (getColor(getRight(sib)) == BLACK &&
+                        getColor(getLeft(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    node = getParent(node);
+                } else {
+                    if (getColor(getLeft(sib)) == BLACK) {
+                        setColor(getRight(sib), BLACK);
+                        setColor(sib, RED);
+                        leftRotate(sib);
+                        sib = getLeft(getParent(node));
+                    }
+                    setColor(sib, getColor(getParent(node)));
+                    setColor(getParent(node), BLACK);
+                    setColor(getLeft(sib), BLACK);
+                    rightRotate(getParent(node));
+                    node = root;
                 }
             }
         }

@@ -166,19 +166,7 @@ public class AVLTree<T extends Comparable<T>> {
 
     //
     public boolean contain(T data){
-        AVLNode<T> p = this.root;
-
-        while(p != null){
-            if(data.compareTo(p.data) < 0){
-                p = p.left;
-            }
-            else if(data.compareTo(p.data) > 0){
-                p = p.right;
-            }
-            else
-                break;
-        }
-        return p != null;
+        return findNode(data)!= null ? true : false;
     }
 
     public void preInorder(){
@@ -277,7 +265,6 @@ public class AVLTree<T extends Comparable<T>> {
         }
         return p;
     }
-
 
     //平衡二叉树的嫁接节点
     private void transplant(AVLNode<T> deleteNode, AVLNode<T> nextNode){
