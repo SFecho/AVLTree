@@ -1,6 +1,9 @@
 package com.util.tree;
 
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 //利用红黑树实现set模板
 public class RBTree<T extends Comparable<T>> {
@@ -8,7 +11,7 @@ public class RBTree<T extends Comparable<T>> {
     private final static boolean RED = false;
     private final static boolean BLACK = true;
 
-    private class RBNode<T extends Comparable<T>> extends Node<T> {
+    private final static class RBNode<T extends Comparable<T>> extends Node<T> {
 
         protected RBNode<T> left;
         protected RBNode<T> right;
@@ -28,49 +31,49 @@ public class RBTree<T extends Comparable<T>> {
         this.root = null;
     }
 
-    private void setColor(RBNode<T> node, boolean color){
+    private static <T extends Comparable<T>> void setColor(RBNode<T> node, boolean color){
         if(node != null)
             node.color = color;
     }
 
-    private boolean getColor(RBNode<T> node){
+    private static <T extends Comparable<T>> boolean getColor(RBNode<T> node){
         return node == null ? BLACK : node.color;
     }
 
-    private RBNode<T> getParent(RBNode<T> node){
+    private static <T extends Comparable<T>> RBNode<T> getParent(RBNode<T> node){
         return node == null ? null : node.parent;
     }
 
-    private void setParent(RBNode<T> node, RBNode<T> newParent){
+    private static <T extends Comparable<T>> void setParent(RBNode<T> node, RBNode<T> newParent){
         if(node != null)
             node.parent = newParent;
 
     }
 
-    private RBNode<T> getLeft(RBNode<T> node){
+    private static <T extends Comparable<T>> RBNode<T> getLeft(RBNode<T> node){
         return node == null ? null : node.left;
     }
 
-    private void setLeft(RBNode<T> node, RBNode<T> newLeft){
+    private static <T extends Comparable<T>> void setLeft(RBNode<T> node, RBNode<T> newLeft){
         if(node != null)
             node.left = newLeft;
     }
 
-    private RBNode<T> getRight(RBNode<T> node){
+    private static <T extends Comparable<T>> RBNode<T> getRight(RBNode<T> node){
         return node == null ? null : node.right;
     }
 
-    private void setRight(RBNode<T> node, RBNode<T> newRight){
+    private static <T extends Comparable<T>> void setRight(RBNode<T> node, RBNode<T> newRight){
         if(node != null)
             node.right = newRight;
     }
 
-    private void setData(RBNode<T> node, T newData){
+    private static <T extends Comparable<T>> void setData(RBNode<T> node, T newData){
         if(node != null)
             node.data = newData;
     }
 
-    private T getData(RBNode<T> node){
+    private static <T extends Comparable<T>> T getData(RBNode<T> node){
         return node == null ? null : node.data;
     }
 
@@ -326,26 +329,81 @@ public class RBTree<T extends Comparable<T>> {
         setColor(node, BLACK);
     }
 
+    private final static class RBTreeIterator<T extends Comparable<T>> implements Iterator<T>{
+        private RBNode<T> ptr;
+
+        @Override
+        public boolean hasNext() {
+            return ptr != null;
+        }
+
+        @Override
+        public T next() {
+            T key = getData(ptr);
+            if(getRight(ptr) != null){
+                ptr = getRight(ptr);
+                while (getLeft(ptr) != null)
+                    ptr = getLeft(ptr);
+            }else{
+                RBNode<T> parent = getParent(ptr);
+                while(getRight(parent) == ptr){
+                    ptr = parent;
+                    parent = getParent(parent);
+                }
+
+                if(getRight(ptr) != parent)
+                    ptr = parent;
+            }
+            return key;
+        }
+
+        @Override
+        public void remove() {
+
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super T> action) {
+
+        }
+    }
+
+    public Iterator<T> iterator(){
+        RBTreeIterator<T> iterator = new RBTreeIterator<>();
+        iterator.ptr = this.root;
+        while(getLeft(iterator.ptr) != null)
+            iterator.ptr = getLeft(iterator.ptr);
+        return iterator;
+    }
+
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
 
-        Stack<RBNode<T>> stack = new Stack<>();
-
         RBNode<T> p = this.root;
 
-        while(p != null || stack.isEmpty() == false){
-            while(p != null){
-                stack.push(p);
-                p = p.left;
+        while(getLeft(p) != null){
+            p = getLeft(p);
+        }
+
+        while(p != null){
+            stringBuffer.append(getData(p) + " ");
+
+            if(getRight(p) != null){
+                p = getRight(p);
+                while(getLeft(p) != null){
+                    p = getLeft(p);
+                }
+            }else{
+                RBNode<T> parent = getParent(p);
+                while(getRight(parent) == p){
+                    p = parent;
+                    parent = getParent(parent);
+                }
+                if(getRight(p) != parent)
+                    p = parent;
             }
 
-            if(stack.isEmpty() == false){
-                RBNode<T>  top = stack.pop();
-
-                stringBuffer.append(top.data  + " ");
-                p = top.right;
-            }
         }
         return stringBuffer.toString();
     }
@@ -396,5 +454,4 @@ public class RBTree<T extends Comparable<T>> {
         }
         System.out.println();
     }
-
 }

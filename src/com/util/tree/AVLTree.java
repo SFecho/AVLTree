@@ -11,7 +11,7 @@ public class AVLTree<T extends Comparable<T>> {
     }
 
     //树的节点，内部类
-    private class AVLNode<T extends Comparable<T>> extends Node<T> {
+    private static final class AVLNode<T extends Comparable<T>> extends Node<T> {
 
         protected AVLNode<T> left;
         protected AVLNode<T> right;
@@ -26,7 +26,7 @@ public class AVLTree<T extends Comparable<T>> {
     }
 
     //得到当前节点的高度
-    private int getHeight(AVLNode node) {
+    private static <T extends Comparable<T>> int getHeight(AVLNode<T> node) {
         return node == null ? -1 : node.height;
     }
 
@@ -313,6 +313,7 @@ public class AVLTree<T extends Comparable<T>> {
             transplant(delNode, tmpMinNode);
         }
         deleteFixUp(fixUpNode);
+        delNode.left = delNode.parent = delNode.right = null;
     }
 
     //删除修复函数

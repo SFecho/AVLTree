@@ -3,14 +3,15 @@ package com.test;
 import com.util.tree.AVLTree;
 import com.util.tree.RBTree;
 
+import java.util.Iterator;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-
         AVLTree<Integer> avlTree = new AVLTree<>();
         Random random = new Random();
         int a[] = new int[12];
@@ -18,6 +19,11 @@ public class Main {
            a[i] = random.nextInt(100);
            avlTree.insert(a[i]);
         }
+
+        for(int tmp : a)
+            System.out.print(tmp + " ");
+        System.out.println();
+
         System.out.println("===========AVLTree-set===========");
 
         System.out.println(avlTree);
@@ -67,6 +73,13 @@ public class Main {
         for(int i = 0; i < a.length; i++) {
             rbTree.insert(a[i]);
         }
+
+        Iterator<Integer> itr = rbTree.iterator();
+        while(itr.hasNext()){
+            int data = itr.next();
+            System.out.print(data + " ");
+        }
+        System.out.println();
 
         System.out.println(rbTree);
         rbTree.preInorder();
